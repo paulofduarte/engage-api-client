@@ -32,6 +32,8 @@ public abstract class ApiClient<REQUEST extends ApiRequest> {
 		this.commandProcessor = commandProcessor;
 		this.httpClient = httpClient;
 		this.session = session;
+
+		setProxy(httpClient);
 	}
 
 	public ApiResult executeCommand(ApiCommand command) throws ApiResultException {
@@ -116,6 +118,15 @@ public abstract class ApiClient<REQUEST extends ApiRequest> {
             log.debug("Got Error Response");
 			String msg = String.format("API call '%s' unsuccessful.", requestName);
 			throw new ApiResultException(msg, response.buildErrorResult());
+		}
+	}
+
+	private void setProxy(HttpClient httpClient) {
+		String httpProxyHost = System.getProperty("http.proxyHost");
+		Integer httpProxyPort = Integer.getInteger("http.proxyPort");
+
+		if (httpProxyHost != null && httpProxyPort != null) {
+			httpClient.getHostConfiguration().setProxy(httpProxyHost, httpProxyPort);
 		}
 	}
 }
